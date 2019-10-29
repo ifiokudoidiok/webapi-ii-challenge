@@ -10,6 +10,43 @@ router.get("/:id", getPostById);
 router.put("/:id", editPost);
 
 router.get("/:id/comments", getComments);
+router.post("/:id/comments", postComments);
+
+function postComments(req, res) {
+  const { id } = req.params;
+  const postComment = {...req.body, post_id: id } 
+
+
+db.findById(id)
+.then(post => {
+  if(!post[0]){
+    res.status(404).json({
+      message: "The post with the specified ID does not exist"
+    })
+  }
+})
+.catch(error => {
+  res.status(500).json({
+    error: "There was an error while saving the comment to the database" + " " + error
+  })
+})
+
+if(!req.body.text){
+  res.status(400).json({
+    errorMessage: "Please provide text for the comment"
+  })
+}else{
+  db.insertComment(postComment)
+  .then(() => {
+    res.status(201).json(postComment)
+  })
+  .catch(error => {
+    res.status(500).json({
+      error: "There was an error while saving the comment to the database" + " " + error
+    })
+  })
+}
+}
 
 function getComments(req, res) {
   const { id } = req.params;
