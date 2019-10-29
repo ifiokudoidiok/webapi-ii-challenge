@@ -6,6 +6,24 @@ const router = express.Router();
 router.post("/", postUser);
 router.get("/", getAllPosts);
 router.delete("/:id", deletePost);
+router.get("/:id", getPostById);
+
+function getPostById(req, res) {
+  const { id } = req.params
+  db.findById(id)
+      .then(post => {
+          if (post.length < 1) {
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+          }
+          else {
+             
+              res.status(200).json(post)
+          }
+      })
+      .catch(error => {
+          res.status(500).json({ error: "The posts information could not be retrieved." + " " + error })
+      })
+}
 
 function deletePost(req, res) {
   const id = req.params.id;
