@@ -7,6 +7,38 @@ router.post("/", postUser);
 router.get("/", getAllPosts);
 router.delete("/:id", deletePost);
 router.get("/:id", getPostById);
+router.put("/:id", editPost);
+
+function editPost(req, res) {
+  const { id } = req.params;
+  const editedVersion = req.body;
+
+  db.update(id, editedVersion).then(edit => {
+    if(edit){
+      if(editedVersion.title && editedVersion.contents){
+        db.findById(id).then(post => {
+          res.status(200).json({
+            post
+          })
+        })
+      }else{
+        res.status(400).json({
+          errorMessage: "Please provide title and contents for the post"
+        })
+      }
+    }else{
+      res.status(404).json({
+        message: "The post with the specified ID does not exist"
+      })
+    }
+  }).catch(error => {
+    res.status(500).json({
+      success:false,
+      error: "The post information could not be modified" + " " + error
+    })
+  })
+
+}
 
 function getPostById(req, res) {
   const { id } = req.params
