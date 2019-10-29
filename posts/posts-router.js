@@ -5,9 +5,30 @@ const router = express.Router();
 
 router.post("/", postUser);
 router.get("/", getAllPosts);
+router.delete("/:id", deletePost);
+
+function deletePost(req, res) {
+  const id = req.params.id;
+  db.remove(id)
+    .then(deletedPost => {
+      if (deletedPost) {
+        res.status(204).end();
+      } else {
+        res.status(404).json({
+          success: false,
+          message:  "The post with the specified ID does not exist."
+        });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        success: false,
+        error: "The post could not be removed" + " " + error
+      });
+    })
+}
 
 function postUser(req, res) {
- 
   const newPost = req.body;
   if (!newPost.title || !newPost.contents) {
     return res.status(400).json({
