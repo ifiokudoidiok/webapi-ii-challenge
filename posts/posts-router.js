@@ -9,6 +9,27 @@ router.delete("/:id", deletePost);
 router.get("/:id", getPostById);
 router.put("/:id", editPost);
 
+router.get("/:id/comments", getComments);
+
+function getComments(req, res) {
+  const { id } = req.params;
+  db.findPostComments(id)
+  .then(comments => {
+    if((!comments) || (comments.length === 0)){
+      res.status(400).json({
+        message: "The post with the specified ID does not exist"
+      })
+    }else{
+      res.status(200).json(comments)
+    }
+  })
+  .catch(error => {
+    res.status(500).json({
+      error: "The comment information could not be retrieved" + " " + error
+    })
+  })
+}
+
 function editPost(req, res) {
   const { id } = req.params;
   const editedVersion = req.body;
